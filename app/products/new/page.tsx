@@ -4,12 +4,18 @@ import { supabase } from "@/lib/supabase"
 import { useEffect, useState } from "react"
 
 export default function CreateProductForm() {
+
+  type Category = {
+    id: string
+    name: string
+  }
+
   const [name, setName] = useState("")
   const [sku, setSku] = useState("")
   const [price, setPrice] = useState("")
   const [stock_quantity, setStockQuantity] = useState("")
   const [low_stock_threshold, setLowStockThreshold] = useState("")
-  const [categories, setCategories] = useState<any[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [categoryId, setCategoryId] = useState("")
 
   useEffect(() => {
