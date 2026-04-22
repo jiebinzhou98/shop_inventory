@@ -18,18 +18,35 @@ export default async function ProductsPage() {
     .order("created_at", { ascending: false })
 
   if (error) {
-    return <div className="p-6">Error loading products</div>
+    return (
+      <main className="min-h-screen bg-[#f6f7fb] px-6 py-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="rounded-[24px] border border-gray-200 bg-white p-8 shadow-sm">
+            <h1 className="text-lg font-semibold text-gray-900">
+              Error loading products
+            </h1>
+            <p className="mt-2 text-sm text-gray-500">
+              Please try again later.
+            </p>
+          </div>
+        </div>
+      </main>
+    )
   }
 
   const safeProducts = products ?? []
 
   const totalProducts = safeProducts.length
+
   const lowStockCount = safeProducts.filter(
-    (product) => product.stock_quantity <= product.low_stock_threshold
+    (product) =>
+      product.stock_quantity > 0 &&
+      product.stock_quantity <= product.low_stock_threshold
   ).length
-  const totalValuation = safeProducts.reduce((sum, product) => {
-    return sum + Number(product.price) * product.stock_quantity
-  }, 0)
+
+  const outOfStockCount = safeProducts.filter(
+    (product) => product.stock_quantity === 0
+  ).length
 
   const activeCategories = new Set(
     safeProducts
@@ -38,121 +55,186 @@ export default async function ProductsPage() {
   ).size
 
   return (
-    <main className="min-h-screen bg-gray-50 p-6">
-      <div className="mx-auto max-w-7xl space-y-6">
-        <div className="flex items-start justify-between">
+    <main className="min-h-screen bg-[#f6f7fb] px-6 py-8">
+      <div className="mx-auto max-w-7xl space-y-8">
+        <section className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-gray-500">
               Inventory Overview
             </p>
-            <h1 className="mt-2 text-4xl font-bold tracking-tight text-gray-900">
+            <h1 className="mt-3 text-5xl font-bold tracking-tight text-[#111827]">
               Products
             </h1>
           </div>
 
           <Link
             href="/products/new"
-            className="rounded-xl bg-zinc-800 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-700"
+            className="inline-flex h-12 items-center justify-center rounded-2xl bg-[#2f2d39] px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-[#26242f]"
           >
             + New Product
           </Link>
-        </div>
+        </section>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-[24px] border border-gray-200 bg-white px-6 py-5 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500">
               Total Catalog
             </p>
-            <p className="mt-3 text-4xl font-bold text-gray-900">
+            <p className="mt-5 text-5xl font-bold tracking-tight text-[#111827]">
               {totalProducts}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <div className="rounded-[24px] border border-gray-200 bg-white px-6 py-5 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500">
               Low Stock Alert
             </p>
-            <p className="mt-3 text-4xl font-bold text-gray-900">
+            <p className="mt-5 text-5xl font-bold tracking-tight text-[#111827]">
               {lowStockCount}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-              Total Valuation
+          <div className="rounded-[24px] border border-gray-200 bg-white px-6 py-5 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500">
+              Out of Stock
             </p>
-            <p className="mt-3 text-4xl font-bold text-gray-900">
-              ${totalValuation.toFixed(2)}
+            <p className="mt-5 text-5xl font-bold tracking-tight text-[#111827]">
+              {outOfStockCount}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <div className="rounded-[24px] border border-gray-200 bg-white px-6 py-5 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500">
               Active Categories
             </p>
-            <p className="mt-3 text-4xl font-bold text-gray-900">
+            <p className="mt-5 text-5xl font-bold tracking-tight text-[#111827]">
               {activeCategories}
             </p>
           </div>
-        </div>
+        </section>
 
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <section className="overflow-hidden rounded-[28px] border border-gray-200 bg-white shadow-sm">
+          <div className="flex items-center justify-between px-6 py-5">
+            <h2 className="text-[15px] font-semibold text-[#111827]">
+              All Products
+            </h2>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
+              >
+                Export
+              </button>
+            </div>
+          </div>
+
           {safeProducts.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              No products found.
+            <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
+              <h3 className="text-lg font-semibold text-[#111827]">
+                No products yet
+              </h3>
+              <p className="mt-2 text-sm text-gray-500">
+                Start by adding your first inventory item.
+              </p>
+              <Link
+                href="/products/new"
+                className="mt-6 inline-flex h-11 items-center justify-center rounded-2xl bg-[#2f2d39] px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#26242f]"
+              >
+                Add Product
+              </Link>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full text-left">
-                <thead className="border-b border-gray-200 bg-gray-50">
-                  <tr className="text-xs uppercase tracking-wide text-gray-500">
-                    <th className="px-6 py-4 font-semibold">Product</th>
-                    <th className="px-6 py-4 font-semibold">SKU</th>
-                    <th className="px-6 py-4 font-semibold">Category</th>
-                    <th className="px-6 py-4 font-semibold">Price</th>
-                    <th className="px-6 py-4 font-semibold">Stock</th>
-                    <th className="px-6 py-4 font-semibold">Status</th>
+              <table className="min-w-full">
+                <thead className="border-t border-gray-200 border-b border-gray-200 bg-[#fafafa]">
+                  <tr className="text-left text-xs font-semibold uppercase tracking-[0.22em] text-gray-500">
+                    <th className="px-6 py-4">Product Details</th>
+                    <th className="px-6 py-4">SKU</th>
+                    <th className="px-6 py-4">Category</th>
+                    <th className="px-6 py-4">Price</th>
+                    <th className="px-6 py-4">Stock</th>
+                    <th className="px-6 py-4">Status</th>
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-gray-100">
+                <tbody>
                   {safeProducts.map((product) => {
+                    const categoryName =
+                      product.categories?.[0]?.name ?? "Uncategorized"
+
+                    const isOutOfStock = product.stock_quantity === 0
                     const isLowStock =
+                      product.stock_quantity > 0 &&
                       product.stock_quantity <= product.low_stock_threshold
 
                     return (
-                      <tr key={product.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4">
-                          <p className="font-semibold text-gray-900">
-                            {product.name}
-                          </p>
+                      <tr
+                        key={product.id}
+                        className="border-b border-gray-100 transition hover:bg-[#fcfcfd]"
+                      >
+                        <td className="px-6 py-5">
+                          <div className="flex items-center gap-4">
+                            <div className="h-12 w-12 rounded-xl bg-gray-200" />
+                            <div>
+                              <p className="text-base font-semibold text-[#111827]">
+                                {product.name}
+                              </p>
+                              <p className="mt-1 text-sm text-gray-500">
+                                {categoryName}
+                              </p>
+                            </div>
+                          </div>
                         </td>
 
-                        <td className="px-6 py-4 text-sm text-gray-600">
+                        <td className="px-6 py-5 text-sm font-medium text-gray-600">
                           {product.sku}
                         </td>
 
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {product.categories?.[0]?.name ?? "Uncategorized"}
+                        <td className="px-6 py-5">
+                          <span className="inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
+                            {categoryName}
+                          </span>
                         </td>
 
-                        <td className="px-6 py-4 text-sm font-medium text-gray-800">
+                        <td className="px-6 py-5 text-base font-semibold text-[#111827]">
                           ${Number(product.price).toFixed(2)}
                         </td>
 
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {product.stock_quantity}
+                        <td className="px-6 py-5">
+                          <div>
+                            <p
+                              className={
+                                isOutOfStock
+                                  ? "text-base font-semibold text-red-600"
+                                  : isLowStock
+                                  ? "text-base font-semibold text-amber-600"
+                                  : "text-base font-semibold text-[#111827]"
+                              }
+                            >
+                              {product.stock_quantity}
+                            </p>
+                            <p className="mt-1 text-xs font-medium text-gray-400">
+                              L: {product.low_stock_threshold}
+                            </p>
+                          </div>
                         </td>
 
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-5">
                           <span
                             className={
-                              isLowStock
-                                ? "inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700"
-                                : "inline-flex rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700"
+                              isOutOfStock
+                                ? "inline-flex rounded-full bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-700"
+                                : isLowStock
+                                ? "inline-flex rounded-full bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-700"
+                                : "inline-flex rounded-full bg-green-100 px-3 py-1.5 text-xs font-semibold text-green-700"
                             }
                           >
-                            {isLowStock ? "Low Stock" : "In Stock"}
+                            {isOutOfStock
+                              ? "Out of Stock"
+                              : isLowStock
+                              ? "Low Stock"
+                              : "In Stock"}
                           </span>
                         </td>
                       </tr>
@@ -162,7 +244,7 @@ export default async function ProductsPage() {
               </table>
             </div>
           )}
-        </div>
+        </section>
       </div>
     </main>
   )
