@@ -1,15 +1,15 @@
 "use client"
 
 import { supabase } from "@/lib/supabase"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 
+type Category = {
+  id: string
+  name: string
+}
+
 export default function CreateProductForm() {
-
-  type Category = {
-    id: string
-    name: string
-  }
-
   const [name, setName] = useState("")
   const [sku, setSku] = useState("")
   const [price, setPrice] = useState("")
@@ -72,55 +72,163 @@ export default function CreateProductForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 space-y-4">
-      <h1 className="text-xl font-bold">Create Product</h1>
+    <main className="min-h-screen bg-gray-50 p-6">
+      <div className="mx-auto max-w-5xl space-y-8">
+        <section className="space-y-3">
+          <span className="inline-flex rounded-full bg-gray-200 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-gray-600">
+            Inventory Management
+          </span>
 
-      <input
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+          <div className="space-y-2">
+            <h1 className="text-5xl font-bold tracking-tight text-gray-900">
+              New Product
+            </h1>
+            <p className="max-w-2xl text-lg text-gray-600">
+              Create a new entry in your catalog. Fill in the details below to
+              initialize stock levels and pricing.
+            </p>
+          </div>
+        </section>
 
-      <input
-        placeholder="SKU"
-        value={sku}
-        onChange={(e) => setSku(e.target.value)}
-      />
+        <section className="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold uppercase tracking-wide text-gray-600">
+                  Product Name
+                </label>
+                <input
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-gray-400 focus:bg-white"
+                  placeholder="e.g. Minimalist Ceramic Vase"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
 
-      <input
-        placeholder="Price"
-        type="number"
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
-      />
+              <div className="space-y-2">
+                <label className="text-sm font-semibold uppercase tracking-wide text-gray-600">
+                  SKU Identification
+                </label>
+                <input
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-gray-400 focus:bg-white"
+                  placeholder="SKU-8829-XL"
+                  value={sku}
+                  onChange={(e) => setSku(e.target.value)}
+                />
+              </div>
 
-      <input
-        placeholder="Stock Quantity"
-        type="number"
-        value={stock_quantity}
-        onChange={(e) => setStockQuantity(e.target.value)}
-      />
+              <div className="space-y-2">
+                <label className="text-sm font-semibold uppercase tracking-wide text-gray-600">
+                  Category Classification
+                </label>
+                <select
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-gray-400 focus:bg-white"
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(e.target.value)}
+                >
+                  <option value="">Select Category</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-      <input
-        placeholder="Low Stock Threshold"
-        type="number"
-        value={low_stock_threshold}
-        onChange={(e) => setLowStockThreshold(e.target.value)}
-      />
+              <div className="space-y-2">
+                <label className="text-sm font-semibold uppercase tracking-wide text-gray-600">
+                  Listing Price (USD)
+                </label>
+                <input
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-gray-400 focus:bg-white"
+                  type="number"
+                  placeholder="$ 0.00"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                />
+              </div>
+            </div>
 
-      <select
-        value={categoryId}
-        onChange={(e) => setCategoryId(e.target.value)}
-      >
-        <option value="">Select category</option>
-        {categories.map((category) => (
-          <option key={category.id} value={category.id}>
-            {category.name}
-          </option>
-        ))}
-      </select>
+            <div className="border-t border-gray-200 pt-6">
+              <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-600">
+                Stock Configuration
+              </h2>
 
-      <button type="submit">Create Product</button>
-    </form>
+              <div className="mt-6 grid gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold uppercase tracking-wide text-gray-600">
+                    Initial Stock Quantity
+                  </label>
+                  <input
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-gray-400 focus:bg-white"
+                    type="number"
+                    placeholder="0"
+                    value={stock_quantity}
+                    onChange={(e) => setStockQuantity(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold uppercase tracking-wide text-gray-600">
+                    Low Stock Threshold
+                  </label>
+                  <input
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition focus:border-gray-400 focus:bg-white"
+                    type="number"
+                    placeholder="5"
+                    value={low_stock_threshold}
+                    onChange={(e) => setLowStockThreshold(e.target.value)}
+                  />
+                  <p className="text-xs text-gray-500">
+                    System will trigger alert when stock falls below this number.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-4">
+              <Link
+                href="/products"
+                className="text-sm font-medium text-gray-600 transition hover:text-gray-900"
+              >
+                Cancel
+              </Link>
+
+              <button
+                type="submit"
+                className="rounded-xl bg-zinc-800 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-700"
+              >
+                Save Product
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section className="grid gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <p className="text-sm font-semibold text-gray-900">Smart SKU</p>
+            <p className="mt-2 text-sm text-gray-600">
+              Leave SKU empty later if you want to auto-generate based on
+              category rules.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <p className="text-sm font-semibold text-gray-900">Live Preview</p>
+            <p className="mt-2 text-sm text-gray-600">
+              Product will be available in your inventory list immediately after
+              saving.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <p className="text-sm font-semibold text-gray-900">Validation</p>
+            <p className="mt-2 text-sm text-gray-600">
+              Name, SKU, and price are required before the product can be saved.
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
   )
 }
